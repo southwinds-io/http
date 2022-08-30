@@ -78,19 +78,19 @@ func (s *Server) Serve() {
 	router := mux.NewRouter()
 
 	// registers web handlers
-	router.HandleFunc("/", s.liveHandler).Methods("GET")
+	router.HandleFunc("/", s.liveHandler).Methods(http.MethodGet)
 
 	// swagger configuration
 	if s.Conf.includeOpenAPI && s.Conf.SwaggerEnabled() {
-		fmt.Printf("? OpenAPI available at /api\n")
+		log.Println("OpenAPI available at /api")
 		router.PathPrefix("/api").Handler(httpSwagger.WrapHandler)
 	}
 
 	// Prometheus endpoint
 	if s.Conf.MetricsEnabled() {
 		// prometheus metrics
-		fmt.Printf("? /metrics endpoint is enabled\n")
-		router.Handle("/metrics", promhttp.Handler()).Methods("GET")
+		log.Println("Prometheus endpoint available at /metrics")
+		router.Handle("/metrics", promhttp.Handler()).Methods(http.MethodGet)
 	}
 
 	// add the http handlers to the router if a registering function has been dclared
@@ -144,10 +144,10 @@ func (s *Server) listen(handler http.Handler) {
 
 	// runs the server asynchronously
 	go func() {
-		fmt.Printf("server listening on :%s\n", s.Conf.HttpPort())
-		fmt.Printf("server started in %v\n", time.Since(s.start))
+		log.Printf("server listening on :%s\n", s.Conf.HttpPort())
+		log.Printf("server started in %v\n", time.Since(s.start))
 		if err := server.ListenAndServe(); err != nil {
-			fmt.Printf("server stopping: %v\n", err)
+			log.Printf("server stopping: %v\n", err)
 			os.Exit(1)
 		}
 	}()
@@ -166,7 +166,7 @@ func (s *Server) listen(handler http.Handler) {
 
 	// on error shutdown
 	if err := server.Shutdown(ctx); err != nil {
-		fmt.Printf("? I am shutting down due to an error: %v\n", err)
+		log.Printf("? I am shutting down due to an error: %v\n", err)
 	}
 }
 
@@ -177,7 +177,7 @@ func (s *Server) Write(w http.ResponseWriter, r *http.Request, obj interface{}) 
 		bs  []byte
 		err error
 	)
-	// gets the accept http header
+	// gets the Accept http header
 	accept := r.Header.Get("Accept")
 	switch accept {
 	case "*/*":
