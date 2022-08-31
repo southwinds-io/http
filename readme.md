@@ -43,4 +43,18 @@ func doSomething(writer http.ResponseWriter, request *http.Request) {
 }
 ```
 
-For a more complete example [see here](server_test.go)
+For a more complete example [see here](server_test.go).
+
+### Configuratiion
+
+The server can be configured via the following environment variables:
+
+| name | description | default |
+|---|---|---|
+| `HTTP_METRICS_ENABLED` | enables Prometheus endpoint at /metrics | true |
+|`HTTP_OPEN_API_ENABLED` | enables Swagger enpoint at /api/ | true |
+|`HTTP_PORT` | port on which the server listen | 8080 |
+|`HTTP_USER` | basic authentication user name  | admin|
+|`HTTP_PASSWORD` | basic authentication password  | auto-generated |
+|`HTTP_REALM` | the realm name for browser WWW-Authenticate prompt | none |
+
