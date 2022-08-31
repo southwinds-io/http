@@ -1,7 +1,7 @@
 # HTTP Server Library
 
 The HTTP server library helps to quickly create a consistent HTTP server
-with some useful middlewares, OpenAPI and standard access controls.
+with some useful middlewares, OpenAPI, Prometheus metrics and standard access controls.
 
 The server is focused on serving REST style APIs and is based on the [Gorilla Mux](https://github.com/gorilla/mux) request 
 router and dispatcher.
