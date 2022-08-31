@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"time"
 )
 
 // launch the server
@@ -27,9 +28,24 @@ func TestServer_Serve(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// configure http handlers
 	s.Http = func(router *mux.Router) {
-		router.HandleFunc("/", doSomething).Methods("GET")
+		// add middlewares
 		router.Use(s.AuthenticationMiddleware)
+		router.Use(s.LoggingMiddleware)
+		// add handler
+		router.HandleFunc("/", doSomething).Methods("GET")
+		router.HandleFunc("/items/abc", doSomething).Methods("GET")
+	}
+	// customised authentication on a path basis
+	s.Auth = map[string]func(http.Request) *UserPrincipal{
+		// authorise all requests for the path /items/....
+		"^/items/.*": func(request http.Request) *UserPrincipal {
+			return &UserPrincipal{
+				Username: "guest",
+				Created:  time.Now(),
+			}
+		},
 	}
 	// serve
 	s.Serve()
