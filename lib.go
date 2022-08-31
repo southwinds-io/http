@@ -178,18 +178,17 @@ func FindRealIP(r *http.Request) string {
 // RandomPwd creates a new password of the specified length with or without symbols
 func RandomPwd(length int, addSymbols bool) string {
 	rand.Seed(time.Now().UnixNano())
-	var chars []rune
-	// if addSymbols is true then
-	if addSymbols {
-		// adds special characters to password character set
+	var (
 		chars = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=!@£#$%&+")
-	} else {
-		// excludes special characters from password character set
-		chars = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
+		b     strings.Builder
+		l     = len(chars)
+	)
+	if !addSymbols {
+		// remove symbols
+		l = l - 11
 	}
-	var b strings.Builder
 	for i := 0; i < length; i++ {
-		b.WriteRune(chars[rand.Intn(len(chars))])
+		b.WriteRune(chars[rand.Intn(l)])
 	}
 	return b.String()
 }

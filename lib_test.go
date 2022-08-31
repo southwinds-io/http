@@ -41,3 +41,7 @@ func TestTokenOverHttp(t *testing.T) {
 		t.Fatal(fmt.Errorf("response error code: %d", resp.StatusCode))
 	}
 }
+
+func TestRndPwd(t *testing.T) {
+	fmt.Println(RandomPwd(50, true))
+}
