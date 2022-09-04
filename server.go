@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 )
 
@@ -27,6 +28,8 @@ import (
 type Server struct {
 	// the start time of the server
 	start time.Time
+	// the version of the http api
+	version string
 	// the server configuration
 	Conf *ServerConfig
 	// basic auth realm
@@ -44,12 +47,13 @@ type Server struct {
 	Whitelist func(request http.Request, requestIP string) (authorised bool)
 }
 
-func New(realm string) *Server {
+func New(realm, version string) *Server {
 	conf := &ServerConfig{includeOpenAPI: true}
 	return &Server{
 		// the server configuration
-		Conf:  conf,
-		realm: realm,
+		Conf:    conf,
+		realm:   realm,
+		version: version,
 		// defines a default authentication function using Basic Authentication
 		// can be overridden to change the behaviour or made nil to have an unauthenticated service or endpoint
 		DefaultAuth: func(r http.Request) *UserPrincipal {
@@ -144,7 +148,7 @@ func (s *Server) listen(handler http.Handler) {
 
 	// runs the server asynchronously
 	go func() {
-		log.Printf("server listening on :%s\n", s.Conf.HttpPort())
+		log.Printf("%s server version '%s' is listening on :%s\n", strings.ToUpper(s.realm), s.version, s.Conf.HttpPort())
 		log.Printf("server started in %v\n", time.Since(s.start))
 		if err := server.ListenAndServe(); err != nil {
 			log.Printf("server stopping: %v\n", err)
@@ -166,7 +170,7 @@ func (s *Server) listen(handler http.Handler) {
 
 	// on error shutdown
 	if err := server.Shutdown(ctx); err != nil {
-		log.Printf("? I am shutting down due to an error: %v\n", err)
+		log.Printf("shutting down due to an error: %v\n", err)
 	}
 }
 
