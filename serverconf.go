@@ -53,13 +53,7 @@ func (c *ServerConfig) HttpUser() string {
 }
 
 func (c *ServerConfig) HttpPwd() string {
-	value := os.Getenv(VarHTTPPassword)
-	if len(value) == 0 {
-		// set as default value
-		value = RandomPwd(20, true)
-		log.Printf("undefined http password, setting it to: '%s'\n", value)
-	}
-	return value
+	return c.getString(VarHTTPPassword, "adm1n")
 }
 
 func (c *ServerConfig) HttpRealm() string {
