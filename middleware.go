@@ -86,6 +86,8 @@ func (s *Server) AuthenticationMiddleware(next http.Handler) http.Handler {
 				if r.Method == http.MethodOptions {
 					next.ServeHTTP(w, r)
 				}
+				// NOTE: any anonymous access user will be prompted is accessing via browser
+				// if anonymous access using browser is required, a revision of design should be considered
 				// if no Authorization header is found and the user agent is a browser
 				if r.Header.Get("Authorization") == "" && isBrowser(r.Header.Get("User-Agent")) {
 					// prompts a client to authenticate by setting WWW-Authenticate response header
