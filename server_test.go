@@ -18,7 +18,7 @@ import (
 // launch the server
 func TestServer_Serve(t *testing.T) {
 	// create a new server
-	s := New("test")
+	s := New("test", "1.0")
 	// set auth credentials
 	err := os.Setenv("HTTP_USER", "test.user")
 	if err != nil {
