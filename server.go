@@ -39,9 +39,9 @@ type Server struct {
 	// jobs function to register async jobs
 	Jobs func() error
 	// map of authentication handlers
-	Auth map[string]func(http.Request) *UserPrincipal
+	Auth map[string]func(http.Request) (*UserPrincipal, error)
 	// default authentication function
-	DefaultAuth func(http.Request) *UserPrincipal
+	DefaultAuth func(http.Request) (*UserPrincipal, error)
 	// a function to identify if a request is in a whitelist
 	// it is used in combination with the whitelist middleware to block requests by sender IP address
 	Whitelist func(request http.Request, requestIP string) (authorised bool)
@@ -56,7 +56,7 @@ func New(realm, version string) *Server {
 		version: version,
 		// defines a default authentication function using Basic Authentication
 		// can be overridden to change the behaviour or made nil to have an unauthenticated service or endpoint
-		DefaultAuth: func(r http.Request) *UserPrincipal {
+		DefaultAuth: func(r http.Request) (*UserPrincipal, error) {
 			requestToken := r.Header.Get("Authorization")
 			// authenticates if the http request token matches the configured basic authentication token
 			if requestToken == conf.BasicToken() {
@@ -66,10 +66,10 @@ func New(realm, version string) *Server {
 					Username: user,
 					Rights:   nil,
 					Created:  time.Now(),
-				}
+				}, nil
 			}
 			// otherwise, return nil meaning that authentication has failed
-			return nil
+			return nil, fmt.Errorf("authentication failed, invalid credentials")
 		},
 	}
 }

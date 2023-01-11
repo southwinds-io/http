@@ -61,11 +61,17 @@ func (s *Server) AuthenticationMiddleware(next http.Handler) http.Handler {
 				// if we have an authentication function defined
 				if authenticate != nil {
 					// then try and authenticate using the specified function
-					user = authenticate(*r)
+					user, err = authenticate(*r)
 					// if authentication fails the there is no user principal returned
 					if user == nil {
+						var errMsg string
+						if err != nil {
+							errMsg = err.Error()
+						} else {
+							errMsg = "Unauthorised"
+						}
 						// Write an error and stop the handler chain
-						http.Error(w, "Forbidden", http.StatusUnauthorized)
+						http.Error(w, errMsg, http.StatusUnauthorized)
 						return
 					} else {
 						// exit loop
@@ -97,10 +103,16 @@ func (s *Server) AuthenticationMiddleware(next http.Handler) http.Handler {
 					return
 				} else {
 					// authenticate the request using the default handler
-					user = s.DefaultAuth(*r)
+					user, err = s.DefaultAuth(*r)
 					if user == nil {
+						var errMsg string
+						if err != nil {
+							errMsg = err.Error()
+						} else {
+							errMsg = "Unauthorised"
+						}
 						// if the authentication failed, write an error and stop the handler chain
-						http.Error(w, "Forbidden", http.StatusUnauthorized)
+						http.Error(w, errMsg, http.StatusUnauthorized)
 						return
 					}
 				}
